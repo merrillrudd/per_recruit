@@ -1,3 +1,9 @@
+### per recruit analysis
+### teaching tool
+### Merrill Rudd
+### March 2016
+
+
 library(shiny)
 
 shinyUI(fluidPage(
