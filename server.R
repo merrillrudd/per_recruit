@@ -76,12 +76,14 @@ get_catch <- function(ages, aselex, surv, exploit, R0, Linf,k,t0,lwa, lwb){
 }
 
   ## spawning biomass per recruit, either in the fished or unfished conditions
-get_SBPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0, unfished){
+get_SBPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0, unfished, text){
   ages <- c(1:input$amax)
   SB <- get_SB(ages, agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0)
   SBPR <- sum(SB)/R0
-  if(unfished==FALSE) return(paste0("SBPR(fished) = ", round(SBPR,0)))
-  if(unfished==TRUE) return(paste0("SBPR(unfished) = ", round(SBPR,0)))
+  if(text==TRUE & unfished==FALSE) return(paste0("SBPR(fished) = ", round(SBPR,0)))
+  if(text==TRUE & unfished==TRUE) return(paste0("SBPR(unfished) = ", round(SBPR,0)))
+  
+  if(text==FALSE) return(round(SBPR,0))
 }
 
   ## spawning potential ratio
@@ -97,12 +99,19 @@ get_SPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0){
 }
 
   ## yield per recruit
-get_YPR <- function(aselex, surv, exploit, Linf,k,t0,lwa, lwb, R0)
+get_YPR <- function(aselex, surv, exploit, Linf,k,t0,lwa, lwb, R0, text)
 {
   ages <- c(1:input$amax)
   Cb_a <- get_catch(ages, input$aselex, input$surv, input$u, 1, input$Linf, input$k, input$t0, input$d, input$b)
   YPR <- sum(Cb_a)/R0 
-  return(paste0("YPR = ", round(YPR,0)))
+  if(text==TRUE) return(paste0("YPR = ", round(YPR,0)))
+  if(text==FALSE) return(YPR)
+}
+
+find_Fref <- function(SBref, agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0, unfished=FALSE, text=FALSE){
+  SBcalc <- get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, exploit, 1, unfished=FALSE, text=FALSE)
+  SBdiff <- SBcalc - SBref
+  return(SBdiff)
 }
 
 ################################
@@ -118,7 +127,7 @@ output$VBGFplot <- renderPlot(
   plot(ages, lengths.out, col = "steelblue",
        xlab="Age",ylab="Length (cm)",xlim=c(0,input$amax),
        ylim=c(0,input$Linf*1.1),type="l",lwd=5,
-       main="Length at age")
+       main="Length at age", xaxs="i", yaxs="i")
 }
     )
 
@@ -130,7 +139,7 @@ output$NumbersAtAge <- renderPlot(
   ## plot numbers at age
   plot(ages, N_a, col = "darkgreen",
        xlab="Age",ylab="Numbers Alive",xlim=c(0,input$amax),
-       ylim=c(0,1.1),type="l",lwd=5, main="Numbers at age")
+       ylim=c(0,1.1),type="l",lwd=5, main="Numbers at age", xaxs="i", yaxs="i")
   
 }
   )
@@ -142,7 +151,7 @@ output$WeightAtAge <- renderPlot(
     W_a <- get_weight(ages, input$Linf, input$k, input$t0, input$d, input$b)
     plot(ages, W_a, col="navyblue", xlab="Age", ylab="Weight (g)",
          xlim=c(0, input$amax), ylim=c(0, max(W_a)*1.1), type="l", lwd=5,
-         main="Weight At Age")
+         main="Weight At Age", xaxs="i", yaxs="i")
   })
 
 
@@ -153,7 +162,7 @@ output$MatureAtAge <- renderPlot(
   Mat_a <- get_mature(input$amat, ages)
   plot(ages, Mat_a, col="goldenrod",
        xlab="Age", ylab="Proportion Mature", xlim=c(0, input$amax),
-       ylim=c(0, max(Mat_a)*1.1), type="l", lwd=5, main="Maturity at Age")
+       ylim=c(0, max(Mat_a)*1.1), type="l", lwd=5, main="Maturity at Age", xaxs="i", yaxs="i")
 }
   )
 
@@ -164,7 +173,7 @@ output$FecundityAtAge <- renderPlot(
     Fec_a <- get_fec(input$amat, ages, input$Linf, input$k, input$t0, input$d, input$b)
     plot(ages, Fec_a, col = "goldenrod4",
          xlab="Age", ylab="Fecundity", xlim=c(0, input$amax),
-         ylim=c(0,max(Fec_a)*1.1), type="l", lwd=5, main="Fecundity at age")
+         ylim=c(0,max(Fec_a)*1.1), type="l", lwd=5, main="Fecundity at age", xaxs="i", yaxs="i")
   })
 
 
@@ -175,7 +184,7 @@ output$SelexAtAge <- renderPlot(
   S_a <- get_selex(input$aselex, ages)
   plot(ages, S_a, col = "forestgreen",
        xlab="Age", ylab="Selectivity", xlim=c(0, input$amax),
-       ylim=c(0,max(S_a)*1.1), type="l", lwd=5, main="Selectivity at age")
+       ylim=c(0,max(S_a)*1.1), type="l", lwd=5, main="Selectivity at age", xaxs="i", yaxs="i")
 })
 
 
@@ -185,7 +194,7 @@ output$SpawnBioAtAge <- renderPlot(
   ages <- c(1:input$amax)
   SB <- get_SB(ages, input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, input$u, 1)
   plot(ages, SB, col="tomato3", xlim=c(0, input$amax),
-       ylim=c(0, max(SB)*1.1), type="l", lwd=5, main="Spawning Biomass at age")
+       ylim=c(0, max(SB)*1.1), type="l", lwd=5, main="Spawning Biomass at age", xaxs="i", yaxs="i")
 }
   )
 
@@ -195,21 +204,21 @@ output$CatchAtAge <- renderPlot(
     ages <- c(1:input$amax)
     Cb_a <- get_catch(ages, input$aselex, input$surv, input$u, 1, input$Linf, input$k, input$t0, input$d, input$b)
     plot(ages, Cb_a, col="darkred", xlim=c(0, input$amax), 
-         ylim=c(0, max(Cb_a)*1.1), type="l", lwd=5, main="Catch at age")
+         ylim=c(0, max(Cb_a)*1.1), type="l", lwd=5, main="Catch at age", xaxs="i", yaxs="i")
     
   })
 
 ## spawning biomass per recruit in fished condition
 output$SBPRf <- renderText(
   {
-    get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, input$u, 1, unfished=FALSE)
+    get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, input$u, 1, unfished=FALSE, text=TRUE)
   })
 
 
 ## spawning biomass per recruit in unfished condition
 output$SBPR0 <- renderText(
   {
-    get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, 0, 1, unfished=TRUE)
+    get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, 0, 1, unfished=TRUE, text=TRUE)
   })
 
 ## spawning potential ratio
@@ -222,9 +231,34 @@ output$SPR <- renderText(
 ## yield per recruit
 output$YPR <- renderText(
   {
-    get_YPR(input$aselex, input$surv, input$u, input$Linf, input$k, input$t0, input$d, input$b, 1)
+    get_YPR(input$aselex, input$surv, input$u, input$Linf, input$k, input$t0, input$d, input$b, 1, text=TRUE)
   }
 )
+
+output$YPRplot <- renderPlot(
+  {
+    uvec <- seq(0,1, by=0.01)
+    YPRvec <- sapply(1:length(uvec), function(x) get_YPR(input$aselex, input$surv, uvec[x], input$Linf, input$k, input$t0, input$d, input$b, 1, text=FALSE))
+    plot(uvec, YPRvec, pch=19, cex=1.5, col="darkred", xlim=c(min(uvec), max(uvec)), ylim=c(0, max(YPRvec)*1.1), 
+         xlab="Exploitation Rate", ylab="Yield Per Recruit", xaxs="i", yaxs="i")
+  })
+
+output$SBPRplot <- renderPlot(
+{
+  uvec <- seq(0,1, by=0.01)
+  SBPRvec <- sapply(1:length(uvec), function(x) get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, uvec[x], 1, unfished=FALSE, text=FALSE))
+  plot(uvec, SBPRvec, pch=19, cex=1.5, col="tomato3", xlim=c(min(uvec), max(uvec)), ylim=c(0, max(SBPRvec)*1.1),
+       xlab="Exploitation Rate", ylab="Spawning Biomass Per Recruit", xaxs="i", yaxs="i", main="Find Reference Point")
+  SBref <- (input$Fref/100)*SBPRvec[1] ## target percentage of spawning biomass from unfished state
+  Fval <- uniroot(find_Fref, lower=uvec[1], upper=uvec[length(uvec)], SBref=SBref, agemat=input$amat, Linf=input$Linf, k=input$k, t0=input$t0, 
+                  lwa=input$d, lwb=input$b, aselex=input$aselex, surv=input$surv, R0=1)$root  
+  segments(x0=0, x1=Fval, y0=SBref, y1=SBref, lty=2)
+  segments(x0=Fval, x1=Fval, y0=0, y1=SBref, lty=2)
+  points(x=Fval, y=SBref, pch=16, cex=2.5)
+
+})
+
+
 
 
 ## end

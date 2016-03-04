@@ -1,0 +1,16 @@
+{
+    "contents" : "### per recruit analysis\n### teaching tool\n### Merrill Rudd\n### March 2016\n\n\nlibrary(shiny)\n\nshinyUI(fluidPage(\n  \n  #  Application title\n  titlePanel(\"Per Recruit Analysis\"),\n  \n  tabsetPanel(\n    tabPanel(\"Growth\",\n             sidebarLayout(\n               sidebarPanel(\n                 numericInput(\"amax\", \"Age classes:\", value=25), \n                 numericInput(\"Linf\", withMathJax(\"$$L_\\\\infty:$$\"), value=100),\n                 numericInput(\"k\", \"k:\", value = 0.1),\n                 numericInput(\"t0\", withMathJax(\"$$t_0:$$\"), value = 0),\n                 numericInput(\"b\", \"Weight-Length exponent (b):\", value = 3),\n                 numericInput(\"d\", \"Allometric scaling (d):\",value = 0.0067)\n                 ),\n                mainPanel(\n                  column(5, plotOutput(\"VBGFplot\")),\n                  column(5, plotOutput(\"WeightAtAge\"))\n                  )\n               )\n             \n             ),\n    tabPanel(\"Selectivity and Maturity\",\n             sidebarLayout(\n               sidebarPanel(\n                 numericInput(\"aselex\", \"Age at Selectivity\",  value=7),\n                 numericInput(\"amat\", \"Age at Maturity\",value=7),\n                 numericInput(\"surv\", \"Survival (S)\",value=0.8),\n                 numericInput(\"u\", \"Exploitation Rate (u)\", value=0.3)\n                 ),\n               mainPanel(\n                 column(5, plotOutput(\"SelexAtAge\"), plotOutput(\"MatureAtAge\")),\n                 column(5, plotOutput(\"NumbersAtAge\"), plotOutput(\"FecundityAtAge\"))\n                 )\n               )\n             ),\n    tabPanel(\"Per Recruit\",\n             sidebarLayout(\n               sidebarPanel(\n                 strong(textOutput(\"SBPRf\")),\n                 strong(textOutput(\"SBPR0\")),\n                 br(),\n                 strong(textOutput(\"SPR\"), \n                 br(),\n                 numericInput(\"Fref\", \"Target spawning biomass (% of unfished)\", value=30))\n                 ),\n               mainPanel(\n                 plotOutput(\"SBPRplot\")\n                 )\n               )\n             )\n    \n    )\n  \n))\n",
+    "created" : 1456982072604.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "74064708",
+    "id" : "58BF1CAA",
+    "lastKnownWriteTime" : 1457056820,
+    "path" : "C:/Git_Projects/per_recruit/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
