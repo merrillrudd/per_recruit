@@ -87,7 +87,7 @@ get_SBPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0, u
 }
 
   ## spawning potential ratio
-get_SPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0){
+get_SPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0, text=TRUE){
   ages <- c(1:input$amax)
   SBf <- get_SB(ages, agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0)
   SBPRf <- sum(SBf)/R0
@@ -95,7 +95,8 @@ get_SPR <- function(agemat, Linf, k, t0, lwa, lwb, aselex, surv, exploit, R0){
   SB0 <- get_SB(ages, agemat, Linf, k, t0, lwa, lwb, aselex, surv, 0, R0)
   SBPR0 <- sum(SB0)/R0
   
-  return(paste0("SPR = ", round(SBPRf/SBPR0, 3)))
+  if(text==TRUE) return(paste0("Spawning Potential Ratio = ", round(SBPRf/SBPR0, 3)))
+  if(text==FALSE) return(round(SBPRf/SBPR0, 3))
 }
 
   ## yield per recruit
@@ -248,15 +249,36 @@ output$SBPRplot <- renderPlot(
   uvec <- seq(0,1, by=0.01)
   SBPRvec <- sapply(1:length(uvec), function(x) get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, uvec[x], 1, unfished=FALSE, text=FALSE))
   plot(uvec, SBPRvec, pch=19, cex=1.5, col="tomato3", xlim=c(min(uvec), max(uvec)), ylim=c(0, max(SBPRvec)*1.1),
-       xlab="Exploitation Rate", ylab="Spawning Biomass Per Recruit", xaxs="i", yaxs="i", main="Find Reference Point")
+       xlab="Exploitation Rate", ylab="Spawning Biomass Per Recruit", xaxs="i", yaxs="i", main="Find reference point")
   SBref <- (input$Fref/100)*SBPRvec[1] ## target percentage of spawning biomass from unfished state
   Fval <- uniroot(find_Fref, lower=uvec[1], upper=uvec[length(uvec)], SBref=SBref, agemat=input$amat, Linf=input$Linf, k=input$k, t0=input$t0, 
                   lwa=input$d, lwb=input$b, aselex=input$aselex, surv=input$surv, R0=1)$root  
   segments(x0=0, x1=Fval, y0=SBref, y1=SBref, lty=2)
   segments(x0=Fval, x1=Fval, y0=0, y1=SBref, lty=2)
   points(x=Fval, y=SBref, pch=16, cex=2.5)
+  text(x=0.8, y=max(SBPRvec)*0.8, paste0("F", input$Fref, " = ", round(Fval, 2)), cex=2, font=2)
 
 })
+
+output$Kobe <- renderPlot(
+  {
+    plot(x=1, y=1, type="n", xlim=c(0, 1), ylim=c(0, 2), xaxs="i", yaxs="i",
+         xlab="Spawning Potential Ratio", ylab="F/Fref", main="Status relative to reference point")
+    abline(v=input$Fref/100, lty=2)
+    abline(h=1, lty=2)
+    SPRval <- get_SPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, input$u, 1, text=FALSE)
+    
+    uvec <- seq(0,1, by=0.01)
+    SBPRvec <- sapply(1:length(uvec), function(x) get_SBPR(input$amat, input$Linf, input$k, input$t0, input$d, input$b, input$aselex, input$surv, uvec[x], 1, unfished=FALSE, text=FALSE))
+    SBref <- (input$Fref/100)*SBPRvec[1] ## target percentage of spawning biomass from unfished state
+    Fval <- uniroot(find_Fref, lower=uvec[1], upper=uvec[length(uvec)], SBref=SBref, agemat=input$amat, Linf=input$Linf, k=input$k, t0=input$t0, 
+                    lwa=input$d, lwb=input$b, aselex=input$aselex, surv=input$surv, R0=1)$root  
+    
+    polygon(x=c(0, input$Fref/100, input$Fref/100, 0), y=c(1, 1, 2, 2), col="#AA000050", border=NA)
+    polygon(x=c(input$Fref/100, 1, 1, input$Fref/100), y=c(0, 0, 1, 1), col="#00AA0050", border=NA)
+    
+    points(x=SPRval, y=input$u/Fval, pch=19, col="blue", cex=2)
+  })
 
 
 

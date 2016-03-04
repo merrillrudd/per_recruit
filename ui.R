@@ -54,11 +54,11 @@ shinyUI(fluidPage(
                  numericInput("Fref", "Target spawning biomass (% of unfished)", value=30))
                  ),
                mainPanel(
-                 plotOutput("SBPRplot")
+                 plotOutput("SBPRplot"),
+                 plotOutput("Kobe")
                  )
                )
              )
-    
     )
   
 ))
