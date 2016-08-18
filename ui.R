@@ -15,12 +15,12 @@ shinyUI(fluidPage(
     tabPanel("Growth",
              sidebarLayout(
                sidebarPanel(
-                 numericInput("amax", "Age classes:", value=25), 
-                 numericInput("Linf", withMathJax("$$L_\\infty:$$"), value=100),
-                 numericInput("k", "k:", value = 0.1),
-                 numericInput("t0", withMathJax("$$t_0:$$"), value = 0),
-                 numericInput("b", "Weight-Length exponent (b):", value = 3),
-                 numericInput("d", "Allometric scaling (d):",value = 0.0067)
+                 numericInput("amax", "Age classes:", value=23), 
+                 numericInput("Linf", "Linf:", value=64.58),
+                 numericInput("k", "k:", value = 0.21),
+                 numericInput("t0", "t0:", value = -0.01),
+                 numericInput("b", "Weight-Length exponent:", value = 2.79),
+                 numericInput("d", "Allometric scaling:",value = 0.0245)
                  ),
                 mainPanel(
                   column(5, plotOutput("VBGFplot")),
@@ -32,30 +32,27 @@ shinyUI(fluidPage(
     tabPanel("Selectivity and Maturity",
              sidebarLayout(
                sidebarPanel(
-                 numericInput("aselex", "Age at Selectivity",  value=7),
-                 numericInput("amat", "Age at Maturity",value=7),
-                 numericInput("surv", "Survival (S)",value=0.8),
-                 numericInput("u", "Exploitation Rate (u)", value=0.3)
+                 numericInput("aselex", "Age at Selectivity",  value=3),
+                 numericInput("amat", "Age at Maturity",value=4),
+                 numericInput("M", "Natural Mortality",value=0.43),
+                 numericInput("fish", "Fishing Mortality", value=0.1)
                  ),
                mainPanel(
-                 column(5, plotOutput("SelexAtAge"), plotOutput("MatureAtAge")),
-                 column(5, plotOutput("NumbersAtAge"), plotOutput("FecundityAtAge"))
+                 column(5, plotOutput("SelexMature")),
+                 column(5, plotOutput("NumbersAtAge"))
                  )
                )
              ),
     tabPanel("Per Recruit",
              sidebarLayout(
                sidebarPanel(
-                 strong(textOutput("SBPRf")),
-                 strong(textOutput("SBPR0")),
-                 br(),
                  strong(textOutput("SPR"), 
                  br(),
                  numericInput("Fref", "Target spawning biomass (% of unfished)", value=30))
                  ),
                mainPanel(
-                 plotOutput("SBPRplot"),
-                 plotOutput("Kobe")
+                 column(5, plotOutput("SBPRplot")),
+                 column(5, plotOutput("Kobe"))
                  )
                )
              )
