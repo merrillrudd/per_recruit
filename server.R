@@ -325,7 +325,7 @@ output$Kobe <- renderPlot(
     Fval <- uniroot(find_Fref, lower=uvec[1], upper=50, SBref=SBref, agemat=input$amat, Linf=input$Linf, k=input$k, t0=input$t0, 
                     lwa=input$d, lwb=input$b, aselex=input$aselex, M=input$M, R0=1)$root  
     
-    polygon(x=c(0, input$Fref/100, input$Fref/100, 0), y=c(1, 1, 2, 2), col="#AA000050", border=NA)
+    polygon(x=c(0, input$Fref/100, input$Fref/100, 0), y=c(1, 1, 3, 3), col="#AA000050", border=NA)
     polygon(x=c(input$Fref/100, 1, 1, input$Fref/100), y=c(0, 0, 1, 1), col="#00AA0050", border=NA)
     
     points(x=SPRval, y=input$fish/Fval, pch=19, col="blue", cex=2)
